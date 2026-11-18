@@ -1,0 +1,12 @@
+# Material de la evaluación (no se publica)
+Rubrica y Entregable/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Salidas del pipeline
+reports/
+dependency-input/
