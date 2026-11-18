@@ -10,3 +10,6 @@ __pycache__/
 # Salidas del pipeline
 reports/
 dependency-input/
+
+# Copias locales de reportes para capturas
+evidencias/

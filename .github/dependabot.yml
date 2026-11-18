@@ -1,0 +1,22 @@
+# Actualizaciones automáticas de dependencias con Dependabot.
+# Dependabot revisa semanalmente las dependencias y abre un pull request por
+# cada actualización; el pipeline de Jenkins valida el cambio antes de
+# integrarlo (pruebas, SAST, SCA, DAST y security gate).
+version: 2
+updates:
+  - package-ecosystem: "pip"        # requirements.in / requirements.txt (pip-compile)
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "security"]
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: "docker"     # imagen base del Dockerfile
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "docker"]
+    commit-message:
+      prefix: "docker"

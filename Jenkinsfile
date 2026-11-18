@@ -163,11 +163,14 @@ pipeline {
                 sh '''
                     docker rm -f zap-scan > /dev/null 2>&1 || true
                     set +e
-                    docker run --name zap-scan --network "$LAB_NETWORK" "$ZAP_IMAGE" bash -c "
+                    # zap/zap-rules.conf (versionado) se entrega por stdin al contenedor.
+                    docker run -i --name zap-scan --network "$LAB_NETWORK" "$ZAP_IMAGE" bash -c "
                         mkdir -p /zap/wrk &&
+                        cat > /zap/wrk/zap-rules.conf &&
                         zap-full-scan.py -t 'http://$STAGING_CONTAINER:5000/hello?name=test' -m 1 \
+                            -c zap-rules.conf \
                             -r zap-report.html -J zap-report.json -w zap-report.md -I
-                    "
+                    " < zap/zap-rules.conf
                     ZAP_EXIT=$?
                     set -e
                     mkdir -p reports/zap
