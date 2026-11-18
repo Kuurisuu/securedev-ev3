@@ -1,0 +1,36 @@
+groups:
+  - name: securedev-seguridad
+    rules:
+      - alert: IntentoXSSDetectado
+        expr: sum(increase(app_security_events_total{type="xss_attempt"}[1m])) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Intentos de XSS bloqueados en producción"
+          description: "{{ $value | humanize }} intentos de XSS en el último minuto."
+
+      - alert: ReconocimientoDeRutas
+        expr: sum(increase(app_security_events_total{type="resource_probe"}[1m])) > 5
+        labels:
+          severity: warning
+        annotations:
+          summary: "Posible escaneo de rutas (muchas respuestas 404)"
+          description: "{{ $value | humanize }} rutas inexistentes solicitadas en el último minuto."
+
+      - alert: TasaAltaDeErroresCliente
+        expr: |
+          sum(rate(app_http_requests_total{status=~"4.."}[1m]))
+            / sum(rate(app_http_requests_total[1m])) > 0.3
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Más del 30% de las peticiones terminan en error 4xx"
+
+      - alert: AplicacionCaida
+        expr: up{job="securedev-prod"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "securedev-prod no responde a Prometheus"

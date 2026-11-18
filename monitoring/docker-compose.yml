@@ -1,0 +1,46 @@
+# Monitorización del entorno de producción de SecureDev.
+# Prometheus recolecta las métricas de securedev-prod y evalúa reglas de alerta;
+# Grafana las visualiza en tiempo real. Ambos se publican solo en 127.0.0.1.
+name: securedev-monitoring
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks: [devsecops-lab]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:13.2.6
+    container_name: grafana
+    environment:
+      # La contraseña inicial admin/admin se cambia obligatoriamente al ingresar.
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks: [devsecops-lab]
+    depends_on: [prometheus]
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  devsecops-lab:
+    external: true

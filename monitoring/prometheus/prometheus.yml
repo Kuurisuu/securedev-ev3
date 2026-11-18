@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  # Métricas de la aplicación en producción (puerto interno 9100).
+  - job_name: securedev-prod
+    static_configs:
+      - targets: ["securedev-prod:9100"]
+        labels:
+          environment: production
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
