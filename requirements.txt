@@ -1,0 +1,5 @@
+# Dependencias heredadas del proyecto original.
+# Escenario de laboratorio: versiones antiguas fijadas sin control de
+# dependencias transitivas ni verificación de integridad.
+Flask==2.2.2
+Werkzeug==2.2.2
